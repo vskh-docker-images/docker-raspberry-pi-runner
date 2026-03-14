@@ -1,5 +1,7 @@
 #!/bin/bash
+set -euo pipefail
+
 echo "Enabling binfmt support."
-docker run --rm --privileged multiarch/qemu-user-static:register --reset
+docker run --rm --privileged tonistiigi/binfmt --install all
 
 # end

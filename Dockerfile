@@ -1,14 +1,24 @@
 # Dockerfile to run stuff on Raspberry Pi
 
-FROM balenalib/raspberry-pi-debian:latest
-LABEL "maintainer"="Vadym S. Khondar <vadym@khondar.name>"
-LABEL "description"="Rapbian Bullseye (belenaOS) container with libraspberrypi."
+FROM debian:bookworm
 
-RUN apt update && \
-    apt upgrade -y && \
-    apt install -y libraspberrypi-bin && \
-    apt clean
+LABEL org.opencontainers.image.authors="Vadym S. Khondar <vadym@khondar.name>"
+LABEL org.opencontainers.image.description="Debian Bookworm container with Raspberry Pi tooling (raspi-utils)."
 
-ENTRYPOINT [ "/bin/bash" ]
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && \
+        apt-get install -y --no-install-recommends ca-certificates curl gnupg && \
+        curl -fsSL https://archive.raspberrypi.org/debian/raspberrypi.gpg.key \
+            | gpg --dearmor -o /usr/share/keyrings/raspberrypi-archive-keyring.gpg && \
+        echo "deb [arch=armhf,arm64 signed-by=/usr/share/keyrings/raspberrypi-archive-keyring.gpg] https://archive.raspberrypi.org/debian/ bookworm main" \
+            > /etc/apt/sources.list.d/raspberrypi.list && \
+        apt-get update && \
+        apt-get upgrade -y && \
+        apt-get install -y --no-install-recommends raspi-utils && \
+        apt-get purge -y --auto-remove curl gnupg && \
+        rm -rf /var/lib/apt/lists/*
+
+ENTRYPOINT ["/bin/bash"]
 
 # end
