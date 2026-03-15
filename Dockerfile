@@ -1,21 +1,20 @@
 # Dockerfile to run stuff on Raspberry Pi
 
 FROM debian:bookworm
-
 LABEL org.opencontainers.image.authors="Vadym S. Khondar <vadym@khondar.name>"
 LABEL org.opencontainers.image.description="Debian Bookworm container with Raspberry Pi tooling (raspi-utils)."
-
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && \
         apt-get install -y --no-install-recommends ca-certificates curl gnupg && \
         curl -fsSL https://archive.raspberrypi.org/debian/raspberrypi.gpg.key \
             | gpg --dearmor -o /usr/share/keyrings/raspberrypi-archive-keyring.gpg && \
-        echo "deb [arch=armhf,arm64 signed-by=/usr/share/keyrings/raspberrypi-archive-keyring.gpg] https://archive.raspberrypi.org/debian/ bookworm main" \
+        echo "deb [signed-by=/usr/share/keyrings/raspberrypi-archive-keyring.gpg] https://archive.raspberrypi.org/debian/ bookworm main" \
             > /etc/apt/sources.list.d/raspberrypi.list && \
         apt-get update && \
         apt-get upgrade -y && \
         apt-get install -y --no-install-recommends raspi-utils && \
+        apt-get clean && \
         apt-get purge -y --auto-remove curl gnupg && \
         rm -rf /var/lib/apt/lists/*
 
